@@ -18,6 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\NeuralNetwork\NeuralNet.cpp" />
+    <ClCompile Include="Source\NeuralNetwork\Neuron.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\NeuralNetwork\NeuralNet.h" />
+    <ClInclude Include="Source\NeuralNetwork\Neuron.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{7DE2D297-41AF-4230-B3AB-62A062ECBAEC}</ProjectGuid>
@@ -110,9 +119,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
