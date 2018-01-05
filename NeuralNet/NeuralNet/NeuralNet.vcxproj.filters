@@ -27,6 +27,9 @@
     <ClCompile Include="Source\TestAverage\TestAverage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\TestGame\TestGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\NeuralNetwork\NeuralNet.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\TestAverage\TestAverage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TestGame\TestGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

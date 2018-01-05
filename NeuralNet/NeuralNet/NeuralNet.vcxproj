@@ -23,11 +23,13 @@
     <ClCompile Include="Source\NeuralNetwork\NeuralNet.cpp" />
     <ClCompile Include="Source\NeuralNetwork\Neuron.cpp" />
     <ClCompile Include="Source\TestAverage\TestAverage.cpp" />
+    <ClCompile Include="Source\TestGame\TestGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\NeuralNetwork\NeuralNet.h" />
     <ClInclude Include="Source\NeuralNetwork\Neuron.h" />
     <ClInclude Include="Source\TestAverage\TestAverage.h" />
+    <ClInclude Include="Source\TestGame\TestGame.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
