@@ -13,17 +13,18 @@
 #include "Windows.h"
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #define NUM_NUMBERS_IN_AVERAGE_TEST 3
 #define NUM_SAMPLES_IN_AVERAGE_TEST 1000
 
 #define GAME_WIDTH 120
-#define GAME_HEIGHT 5
-#define GAME_DIFFICULTY 2
-#define GAME_TIME_BETWEEN_MOVES .1
-#define NUM_GAME_TRAINING_FRAMES 2000
+#define GAME_HEIGHT 10
+#define GAME_DIFFICULTY 3
+#define GAME_TIME_BETWEEN_MOVES .25
+#define NUM_GAME_TRAINING_FRAMES 50000
 #define NUM_ROWS_SEEN 3
-#define NUM_ROUNDS_FOR_NET_TO_PLAY 1000
+#define NUM_ROUNDS_FOR_NET_TO_PLAY 10000
 
 int main()
 {
@@ -43,7 +44,7 @@ int main()
 
 	//for (size_t i = 0; i < NUM_SAMPLES_IN_AVERAGE_TEST; ++i)
 	//{
-	//	std::vector<double> resultValues;
+	//	std::vector<float> resultValues;
 
 	//	// feed, train, and get results from the network
 	//	myNet.FeedForward(data.m_data[i]);
@@ -57,7 +58,9 @@ int main()
 
 	//}
 
-	//getchar();
+
+
+
 
 	// Test Game
 
@@ -66,7 +69,6 @@ int main()
 	gameTopology.push_back(NUM_ROWS_SEEN * GAME_HEIGHT);
 	gameTopology.push_back(GAME_HEIGHT);
 	gameTopology.push_back(3);
-	gameTopology.push_back(1);
 
 	NeuralNet gameNet(gameTopology);
 
@@ -75,7 +77,7 @@ int main()
 	for (size_t i = 0; i < 1000; i++)
 	{
 		char input = getchar();
-		int gameInput = 0;
+		float gameInput = 0;
 
 		if (input == 'w')
 		{
@@ -123,7 +125,7 @@ int main()
 	for (size_t i = 0; i < NUM_GAME_TRAINING_FRAMES; i++)
 	{
 		std::vector<bool> obstacles;
-		double correctAnswer = .5f;
+		int correctAnswer = 1;
 		
 		// create a game
 		Game sampleGame(GAME_WIDTH, GAME_HEIGHT, GAME_DIFFICULTY, 0);
@@ -137,19 +139,19 @@ int main()
 		// get the obstacles in view
 		sampleGame.GetObstacleList(obstacles, NUM_ROWS_SEEN);
 
-		// convert that to a vector of doubles
-		std::vector<double> obstaclesDouble;
+		// convert that to a vector of floats
+		std::vector<float> obstaclesfloat;
 		size_t obstacleListSize = obstacles.size();
 
 		for (size_t i = 0; i < obstacleListSize; i++)
 		{
 			if (obstacles[i])
 			{
-				obstaclesDouble.push_back(1.0);
+				obstaclesfloat.push_back(1.0);
 			}
 			else
 			{
-				obstaclesDouble.push_back(0.0);
+				obstaclesfloat.push_back(0.0);
 			}
 		}
 
@@ -160,7 +162,7 @@ int main()
 			// if the next space above the player is open, go up
 			if (obstacles[playerPosition + 1] == 0)
 			{
-				correctAnswer = 1;
+				correctAnswer = 2;
 			}
 			else if (obstacles[playerPosition - 1] == 0) // else if the bottom position is open, take it
 			{
@@ -168,10 +170,10 @@ int main()
 			}
 		}
 
-		std::vector<double> correctAnswerVector;
-		correctAnswerVector.push_back(correctAnswer);
+		std::vector<float> correctAnswerVector(3, 0.0);
+		correctAnswerVector[correctAnswer] = 1.0;
 
-		gameNet.FeedForward(obstaclesDouble);
+		gameNet.FeedForward(obstaclesfloat);
 		gameNet.BackPropogation(correctAnswerVector);
 
 	}
@@ -188,36 +190,40 @@ int main()
 		std::vector<bool> obstacles;
 		netGame.GetObstacleList(obstacles, NUM_ROWS_SEEN);
 
-		// convert that to a vector of doubles
-		std::vector<double> obstaclesDouble;
+		// convert that to a vector of floats
+		std::vector<float> obstaclesfloat;
 		size_t obstacleListSize = obstacles.size();
 
 		for (size_t j = 0; j < obstacleListSize; j++)
 		{
 			if (obstacles[j])
 			{
-				obstaclesDouble.push_back(1.0);
+				obstaclesfloat.push_back(1.0);
 			}
 			else
 			{
-				obstaclesDouble.push_back(0.0);
+				obstaclesfloat.push_back(0.0);
 			}
 		}
 
-		gameNet.FeedForward(obstaclesDouble);
+		gameNet.FeedForward(obstaclesfloat);
 
 		// get the result
-		std::vector<double> netResult;
+		std::vector<float> netResult;
 		gameNet.GetResults(netResult);
 
-		double answer = netResult[0] - .5;
+		float answer = 0;
 
-		if (answer >= -.1 && answer <= .1)
-		{
-			answer = 0;
-		}
+		auto bestFit = std::max_element(netResult.begin(), netResult.end());
+
+		answer = static_cast<float>((std::distance(netResult.begin(), bestFit) - 1) * -1);
 
 		netGame.Update(answer);
+
+		for (int i = 0; i < netResult.size(); ++i)
+		{
+			std::cout << netResult[i] << std::endl;
+		}
 
 		Sleep(static_cast<int>(GAME_TIME_BETWEEN_MOVES * 1000));
 	}

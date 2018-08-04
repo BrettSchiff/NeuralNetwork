@@ -48,7 +48,7 @@ NeuralNet::NeuralNet(const std::vector<size_t> &topology)
 }
 
 // methods
-void NeuralNet::FeedForward(const std::vector<double> &inputs)
+void NeuralNet::FeedForward(const std::vector<float> &inputs)
 {
 	// assert that we have the correct number of inputs
 	assert(inputs.size() == NumberOfNeuronsInLayer(0));
@@ -73,7 +73,7 @@ void NeuralNet::FeedForward(const std::vector<double> &inputs)
 	}
 }
 
-void NeuralNet::BackPropogation(const std::vector<double> &targetValues)
+void NeuralNet::BackPropogation(const std::vector<float> &targetValues)
 {
 	// assert that we are given an appopriate amount of target values
 	assert(targetValues.size() == NumberOfNeuronsInLayer(m_layers.back()));
@@ -87,7 +87,7 @@ void NeuralNet::BackPropogation(const std::vector<double> &targetValues)
 	for (size_t i = 0; i < numOutputNeurons; ++i)
 	{
 		// difference between expected and desired result
-		double difference = targetValues[i] - outputLayer[i].GetOutputValue();
+		float difference = targetValues[i] - outputLayer[i].GetOutputValue();
 		// sum them together
 		m_error += difference * difference;
 	}
@@ -128,7 +128,7 @@ void NeuralNet::BackPropogation(const std::vector<double> &targetValues)
 	}
 }
 
-void NeuralNet::GetResults(std::vector<double> &resultValues) const
+void NeuralNet::GetResults(std::vector<float> &resultValues) const
 {
 	// empty out the container
 	resultValues.clear();

@@ -25,7 +25,7 @@ public:
 
 	// methods
 	// process the next frame, moving the player in the passed direction -1: down, 0: don't move, 1: up
-	void Update(double direction, bool drawGame = 1);
+	void Update(float direction, bool drawGame = 1);
 
 	void GetObstacleList(std::vector<bool>& list, size_t numberOfColumnsToGet);
 

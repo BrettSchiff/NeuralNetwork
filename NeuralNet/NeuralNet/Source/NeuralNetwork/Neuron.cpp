@@ -10,35 +10,35 @@
 #include <cmath>
 #include "Neuron.h"
 
-double Neuron::eta = 0.15;  // overall net training rate 0-1
-double Neuron::alpha = 0.5;	// momentum(incorporation of last weight change) 0-1
+float Neuron::eta = 0.15;  // overall net training rate 0-1
+float Neuron::alpha = 0.5;	// momentum(incorporation of last weight change) 0-1
 
 // constructors
 Neuron::Neuron(size_t neuronsInNextLayer, size_t indexIntoCurrentLayer) : m_indexIntoLayer(indexIntoCurrentLayer), m_gradient(0)
 {
 	for (size_t i = 0; i < neuronsInNextLayer; i++)
 	{
-		double weight = RandomWeight();
-		double weightDelta = 0;
+		float weight = RandomWeight();
+		float weightDelta = 0;
 
 		m_outputWeights.push_back(ConnectionWeights(weight, weightDelta));
 	}
 }
 
 // methods
-double Neuron::GetOutputValue() const
+float Neuron::GetOutputValue() const
 {
 	return m_outputValue;
 }
 
-void Neuron::SetOutputValue(double value)
+void Neuron::SetOutputValue(float value)
 {
 	m_outputValue = value;
 }
 
 void Neuron::FeedForward(const Layer& previousLayer)
 {
-	double cumulativeSum = 0;
+	float cumulativeSum = 0;
 
 	// automatically includes the bias because it is a neuron in the previous layer
 	for (size_t i = 0; i < previousLayer.size(); i++)
@@ -53,15 +53,15 @@ void Neuron::FeedForward(const Layer& previousLayer)
 	SetOutputValue(Neuron::SquashFunction(cumulativeSum));
 }
 
-void Neuron::CalculateOutputGradients(double targetValue)
+void Neuron::CalculateOutputGradients(float targetValue)
 {
-	double difference = targetValue - GetOutputValue();
+	float difference = targetValue - GetOutputValue();
 	m_gradient = difference * Neuron::SquashFunctionDerivative(m_outputValue);
 }
 
 void Neuron::CalculateHiddenGradients(const Layer& nextLayer)
 {
-	double dow = SumDOW(nextLayer);
+	float dow = SumDOW(nextLayer);
 
 	m_gradient = dow * Neuron::SquashFunctionDerivative(m_outputValue);
 }
@@ -73,10 +73,10 @@ void Neuron::UpdateInputWeights(Layer& previousLayer)
 	{
 		Neuron& currentNeuron = previousLayer[i];
 
-		double oldDeltaWeight = currentNeuron.m_outputWeights[m_indexIntoLayer].second;
+		float oldDeltaWeight = currentNeuron.m_outputWeights[m_indexIntoLayer].second;
 
 		// this can be modified in different ways
-		double newDeltaWeight =
+		float newDeltaWeight =
 			  eta   // overall net learning rate from 0 to 1
 			* currentNeuron.GetOutputValue()
 			* m_gradient
@@ -89,13 +89,13 @@ void Neuron::UpdateInputWeights(Layer& previousLayer)
 
 
 // private methods
-double Neuron::RandomWeight()
+float Neuron::RandomWeight()
 {
 	// return random number between - and 1
-	return rand() / static_cast<double>(RAND_MAX);
+	return rand() / static_cast<float>(RAND_MAX);
 }
 
-double Neuron::SquashFunction(double input)
+float Neuron::SquashFunction(float input)
 {
 	//!?!? switch to the sigmoid function later
 
@@ -103,19 +103,19 @@ double Neuron::SquashFunction(double input)
 	return tanh(input);
 }
 
-double Neuron::SquashFunctionDerivative(double input)
+float Neuron::SquashFunctionDerivative(float input)
 {
 	//!?!? switch to the sigmoid function later
 
 	// d/dx(tanh(x)) = 1 - tanh^2(x)
-	double tanhInput = tanh(input);
+	float tanhInput = tanh(input);
 
 	return 1 - (tanhInput * tanhInput);
 }
 
-double Neuron::SumDOW(const Layer& nextLayer) const
+float Neuron::SumDOW(const Layer& nextLayer) const
 {
-	double sum = 0;
+	float sum = 0;
 
 	// sum the contributions to the errors of the nodes this layer feeds
 	for (size_t i = 0; i < nextLayer.size() - 1; ++i)

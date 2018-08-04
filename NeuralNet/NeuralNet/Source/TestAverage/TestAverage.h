@@ -10,7 +10,7 @@
 #pragma once
 #include <vector>
 
-typedef std::vector<double> AverageDataSet;
+typedef std::vector<float> AverageDataSet;
 
 class AverageData
 {
@@ -18,7 +18,7 @@ public:
 	AverageData(size_t numNumbersPerSample, size_t numSamples);
 
 	// private methods
-	static double RandomNumberBetween0and1();
+	static float RandomNumberBetween0and1();
 
 
 	// data

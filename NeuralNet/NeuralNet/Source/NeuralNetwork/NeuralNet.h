@@ -20,9 +20,9 @@ public:
 	NeuralNet(const std::vector<size_t> &topology);
 
 	// methods
-	void FeedForward(const std::vector<double> &inputs);
-	void BackPropogation(const std::vector<double> &targetValues);
-	void GetResults(std::vector<double> &resultValues) const;
+	void FeedForward(const std::vector<float> &inputs);
+	void BackPropogation(const std::vector<float> &targetValues);
+	void GetResults(std::vector<float> &resultValues) const;
 
 private:
 	// private methods
@@ -30,7 +30,7 @@ private:
 	size_t NumberOfNeuronsInLayer(size_t layerNumber) const;
 	static size_t NumberOfNeuronsInLayer(const Layer& layer);
 
-	double m_error;              // error of the current net
+	float m_error;              // error of the current net
 	std::vector<Layer> m_layers; // layers of neurons
 };
 

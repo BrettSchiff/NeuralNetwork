@@ -22,12 +22,12 @@ AverageData::AverageData(size_t numNumbersPerSample, size_t numSamples) : m_numb
 		m_data.push_back(AverageDataSet());
 
 		// sum of the numbers
-		double sum = 0;
+		float sum = 0;
 
 		for (size_t j = 0; j < numNumbersPerSample; ++j)
 		{
 			// generate a random number and add it
-			double randomNumber = RandomNumberBetween0and1();
+			float randomNumber = RandomNumberBetween0and1();
 			sum += randomNumber;
 
 			// push it into the data
@@ -35,7 +35,7 @@ AverageData::AverageData(size_t numNumbersPerSample, size_t numSamples) : m_numb
 		}
 
 		// the correct answer for the average
-		double average = sum / static_cast<double>(numNumbersPerSample);
+		float average = sum / static_cast<float>(numNumbersPerSample);
 
 		// push it to the answers
 		m_correctAnswers.push_back(AverageDataSet());
@@ -43,7 +43,7 @@ AverageData::AverageData(size_t numNumbersPerSample, size_t numSamples) : m_numb
 	}
 }
 
-double AverageData::RandomNumberBetween0and1()
+float AverageData::RandomNumberBetween0and1()
 {
-	return rand() / static_cast<double>(RAND_MAX);
+	return rand() / static_cast<float>(RAND_MAX);
 }

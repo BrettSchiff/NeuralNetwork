@@ -103,7 +103,7 @@ void Game::DrawGameBoard()
 }
 
 // process the next frame, moving the player in the passed direction -1: down, 0: don't move, 1: up
-void Game::Update(double direction, bool drawGame)
+void Game::Update(float direction, bool drawGame)
 {
 	// move one column
 	m_playerColumn += 1;
