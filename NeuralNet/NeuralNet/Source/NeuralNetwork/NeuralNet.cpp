@@ -21,10 +21,7 @@ NeuralNet::NeuralNet(const std::vector<size_t> &topology)
 	// add each layer to the neural net
 	for (size_t i = 0; i < numLayers; ++i)
 	{
-		//!?!? TEMP
-		std::cout << "starting layer: " << i << "\n";
-
-		// get the number of neurons in the next layer, if there is a next layer
+		// get the number of neurons in the next layer, if there is a next layer, otherwise 0
 		size_t numOutputs = (i == (numLayers - 1)) ? 0 : topology[i + 1];
 
 		// add a new layer
@@ -33,17 +30,39 @@ NeuralNet::NeuralNet(const std::vector<size_t> &topology)
 		// add the neurons to that layer(one extra for biases)
 		for (size_t j = 0; j <= topology[i]; j++)
 		{
-			//!?!? TEMP
-			std::cout << "created a neuron\n";
-
 			m_layers.back().push_back(Neuron(numOutputs, j));
 		}
 
 		// set the bias neuron's output to 1
 		m_layers.back().back().SetOutputValue(1.0);
+	}
+}
 
-		//!?!? TEMP
-		std::cout << "finished layer " << i << " with " << topology[i] << " neurons\n\n";
+NeuralNet::NeuralNet(const std::vector<size_t>& topology, const std::vector<float>& weights)
+{
+	// the number of layers
+	size_t numLayers = topology.size();
+	// index of weights for neurons to read
+	size_t index = 0;
+
+	// add each layer to the neural net
+	for (size_t i = 0; i < numLayers; ++i)
+	{
+		// get the number of neurons in the next layer, if there is a next layer, otherwise 0
+		size_t numOutputs = (i == (numLayers - 1)) ? 0 : topology[i + 1] - 1;
+
+		// add a new layer
+		m_layers.push_back(Layer());
+
+		// add the neurons to that layer
+		for (size_t j = 0; j < topology[i]; j++)
+		{
+			m_layers.back().push_back(Neuron(numOutputs, j));
+			m_layers.back().back().ReadInWeights(weights, index);
+		}
+
+		// set the bias neuron's output to 1
+		m_layers.back().back().SetOutputValue(1.0);
 	}
 }
 
@@ -100,7 +119,7 @@ void NeuralNet::BackPropogation(const std::vector<float> &targetValues)
 	{
 		outputLayer[i].CalculateOutputGradients(targetValues[i]);
 	}
-	
+
 	// Calculate gradients on hidden layers
 	for (size_t i = NumberOfLayers() - 2; i > 0; --i)
 	{
@@ -113,7 +132,7 @@ void NeuralNet::BackPropogation(const std::vector<float> &targetValues)
 			hiddenLayer[i].CalculateHiddenGradients(nextLayer);
 		}
 	}
-	
+
 	// Update connection weights on all layers
 	// go through each layer
 	for (size_t i = NumberOfLayers() - 1; i > 0; --i)
@@ -144,6 +163,71 @@ void NeuralNet::GetResults(std::vector<float> &resultValues) const
 	}
 }
 
+void NeuralNet::SerializeToVector(SerializedNeuralNet& serializedNet) const
+{
+	// record the topological data
+	size_t numSerializableLayers = NumberOfLayers();
+	for (size_t i = 0; i < numSerializableLayers; ++i)
+	{
+		serializedNet.first.push_back(m_layers[i].size());
+	}
+	// record all of the weights(-1 because the last layer has no weights)
+	for (size_t i = 0; i < numSerializableLayers - 1; ++i)
+	{
+		size_t neuronsInCurrLayer = m_layers[i].size();
+		for (size_t j = 0; j < neuronsInCurrLayer; ++j)
+		{
+			m_layers[i][j].StoreWeights_Concat(serializedNet.second);
+		}
+	}
+}
+
+void NeuralNet::GeneticBlend(SerializedNeuralNet& const parent1, SerializedNeuralNet& const parent2, SerializedNeuralNet& child)
+{
+	assert(parent1.first.size() == parent2.first.size());
+	assert(parent1.second.size() == parent2.second.size());
+
+	// make sure the child is empty
+	child.first.clear();
+	child.second.clear();
+
+	// copy the topography
+	child.first = parent1.first;
+
+	// blend the weights
+	for (size_t i = 0; i < parent1.second.size(); ++i)
+	{
+		float blend = parent1.second[i] + ((parent2.second[i] - parent1.second[i]) * RandomScalar());
+		child.second.push_back(blend);
+	}
+}
+
+void NeuralNet::Mutate(SerializedNeuralNet& net, float mutationRate, float mutationAmount)
+{
+	for (size_t i = 0; i < net.second.size(); ++i)
+	{
+		// should this section mutate
+		if (RandomScalar() < mutationRate)
+		{
+			// mutate
+			float mutatedWeight = net.second[i] + ((mutationAmount * 2) * RandomScalar()) - mutationAmount;
+
+			// clamp between 0 and 1
+			if (mutatedWeight < 0)
+			{
+				mutatedWeight = 0;
+			}
+			else if (mutatedWeight > 1)
+			{
+				mutatedWeight = 1;
+			}
+
+			// assign new mutated weight
+			net.second[i] = mutatedWeight;
+		}
+	}
+}
+
 // private methods
 size_t NeuralNet::NumberOfLayers() const
 {
@@ -160,4 +244,10 @@ size_t NeuralNet::NumberOfNeuronsInLayer(const Layer& layer)
 {
 	// one less than size to account for the hidden bias neuron
 	return layer.size() - 1;
+}
+
+float NeuralNet::
+RandomScalar()
+{
+	return rand() / static_cast<float>(RAND_MAX);
 }

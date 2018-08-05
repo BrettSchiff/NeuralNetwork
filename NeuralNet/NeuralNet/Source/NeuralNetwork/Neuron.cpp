@@ -10,8 +10,8 @@
 #include <cmath>
 #include "Neuron.h"
 
-float Neuron::eta = 0.15;  // overall net training rate 0-1
-float Neuron::alpha = 0.5;	// momentum(incorporation of last weight change) 0-1
+float Neuron::eta = 0.15f;  // overall net training rate 0-1
+float Neuron::alpha = 0.5f;	// momentum(incorporation of last weight change) 0-1
 
 // constructors
 Neuron::Neuron(size_t neuronsInNextLayer, size_t indexIntoCurrentLayer) : m_indexIntoLayer(indexIntoCurrentLayer), m_gradient(0)
@@ -87,11 +87,31 @@ void Neuron::UpdateInputWeights(Layer& previousLayer)
 	}
 }
 
+void Neuron::StoreWeights_Concat(std::vector<float>& weights) const
+{
+	// store each weight
+	size_t numWeights = m_outputWeights.size();
+	for (size_t i = 0; i < numWeights; ++i)
+	{
+		weights.push_back(m_outputWeights[i].first);
+	}
+}
+
+void Neuron::ReadInWeights(const std::vector<float>& weights, size_t & index)
+{
+	// set each weight
+	size_t numWeights = m_outputWeights.size();
+	for (size_t i = 0; i < numWeights; ++i)
+	{
+		m_outputWeights[i].first = weights[index];
+		++index;
+	}
+}
 
 // private methods
 float Neuron::RandomWeight()
 {
-	// return random number between - and 1
+	// return random number between 0 and 1
 	return rand() / static_cast<float>(RAND_MAX);
 }
 

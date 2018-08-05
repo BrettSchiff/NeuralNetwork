@@ -33,6 +33,10 @@ public:
 	void CalculateHiddenGradients(const Layer& nextLayer);
 	void UpdateInputWeights(Layer& previousLayer);
 
+	// serialization/"genetic" combination
+	void StoreWeights_Concat(std::vector<float>& weights) const;
+	void ReadInWeights(const std::vector<float>& weights, size_t& index);
+
 private:
 	// private methods
 	static float RandomWeight();

@@ -11,26 +11,37 @@
 #include <vector>
 #include "Neuron.h"
 
+#define DEFAULT_MUTATION_RATE   .05f
+#define DEFAULT_MUTATION_AMOUNT .1f
+
 typedef std::vector<Neuron> Layer;  // typedef of a layer of neurons
 
 class NeuralNet
 {
 public:
 	// constructors
-	NeuralNet(const std::vector<size_t> &topology);
+	NeuralNet(const std::vector<size_t>& topology);
+	NeuralNet(const std::vector<size_t>& topology, const std::vector<float>& weights);
 
 	// methods
-	void FeedForward(const std::vector<float> &inputs);
-	void BackPropogation(const std::vector<float> &targetValues);
-	void GetResults(std::vector<float> &resultValues) const;
+	void FeedForward(const std::vector<float>& inputs);
+	void BackPropogation(const std::vector<float>& targetValues);
+	void GetResults(std::vector<float>& resultValues) const;
+
+	// serialization/"genetic" combination
+	typedef std::pair<std::vector<size_t>, std::vector<float>> SerializedNeuralNet;
+	void SerializeToVector(SerializedNeuralNet& serializedNet) const;
+	static void GeneticBlend(SerializedNeuralNet& const parent1, SerializedNeuralNet& const parent2, SerializedNeuralNet& child);
+	static void Mutate(SerializedNeuralNet& net, float mutationRate = DEFAULT_MUTATION_RATE, float mutationAmount = DEFAULT_MUTATION_AMOUNT);
 
 private:
 	// private methods
 	size_t NumberOfLayers() const;
 	size_t NumberOfNeuronsInLayer(size_t layerNumber) const;
 	static size_t NumberOfNeuronsInLayer(const Layer& layer);
+	static float RandomScalar();
 
-	float m_error;              // error of the current net
+	float m_error;              // error of the current form of the net
 	std::vector<Layer> m_layers; // layers of neurons
 };
 
