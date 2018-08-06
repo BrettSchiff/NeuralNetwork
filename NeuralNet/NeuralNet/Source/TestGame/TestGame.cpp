@@ -9,10 +9,13 @@
 //////////////////////////////////////////////////////
 #include "TestGame.h"
 #include <iostream>
+#include <time.h>
 
 Game::Game(size_t width, size_t height, size_t difficulty, bool drawGame) : m_width(width), m_height(height), m_difficulty(difficulty), m_playerColumn(0), m_playerHeight(height / 2)
 {
 	m_gameBoard.clear();
+
+	srand(time(NULL));
 
 	// fill in each column
 	for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -103,10 +106,11 @@ void Game::DrawGameBoard()
 }
 
 // process the next frame, moving the player in the passed direction -1: down, 0: don't move, 1: up
-void Game::Update(float direction, bool drawGame)
+bool Game::Update(float direction, bool drawGame)
 {
 	// move one column
 	m_playerColumn += 1;
+	bool lost = false;
 
 	// loop back to the beginning if necessary
 	if (m_playerColumn >= MAX_SIZE)
@@ -134,22 +138,29 @@ void Game::Update(float direction, bool drawGame)
 		}
 	}
 
-	if (drawGame)
+	// check if the player hits an obstacle
+	if (m_gameBoard[m_playerColumn][m_playerHeight])
 	{
-		// check if the player hits an obstacle
-		if (m_gameBoard[m_playerColumn][m_playerHeight])
-		{
-			m_playerColumn = 0;
-			m_playerHeight = m_height / 2;
+		m_playerColumn = 0;
+		m_playerHeight = m_height / 2;
+		lost = true;
 
+		if (drawGame)
+		{
 			DrawGameBoard();
-			std::cout << "You lost! Keep playing" << std::endl;
+			std::cout << "You lost! Press Enter to keep playing" << std::endl;
+			getchar();
 		}
-		else
+	}
+	else
+	{
+		if (drawGame)
 		{
 			DrawGameBoard();
 		}
 	}
+
+	return lost;
 }
 
 

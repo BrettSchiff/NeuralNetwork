@@ -10,7 +10,7 @@
 #pragma once
 #include <vector>
 
-#define REPEAT_LENGTH 200
+#define REPEAT_LENGTH 500
 #define EMPTY_START 10
 #define MAX_SIZE REPEAT_LENGTH + EMPTY_START
 
@@ -25,7 +25,7 @@ public:
 
 	// methods
 	// process the next frame, moving the player in the passed direction -1: down, 0: don't move, 1: up
-	void Update(float direction, bool drawGame = 1);
+	bool Update(float direction, bool drawGame = 1);
 
 	void GetObstacleList(std::vector<bool>& list, size_t numberOfColumnsToGet);
 

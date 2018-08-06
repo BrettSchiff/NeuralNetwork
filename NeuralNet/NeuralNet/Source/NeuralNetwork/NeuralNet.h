@@ -11,14 +11,16 @@
 #include <vector>
 #include "Neuron.h"
 
-#define DEFAULT_MUTATION_RATE   .05f
-#define DEFAULT_MUTATION_AMOUNT .1f
+#define DEFAULT_MUTATION_RATE   .1f
+#define DEFAULT_MUTATION_AMOUNT .2f
 
 typedef std::vector<Neuron> Layer;  // typedef of a layer of neurons
 
 class NeuralNet
 {
 public:
+	typedef std::pair<std::vector<size_t>, std::vector<float>> SerializedNeuralNet;
+
 	// constructors
 	NeuralNet(const std::vector<size_t>& topology);
 	NeuralNet(const std::vector<size_t>& topology, const std::vector<float>& weights);
@@ -29,7 +31,6 @@ public:
 	void GetResults(std::vector<float>& resultValues) const;
 
 	// serialization/"genetic" combination
-	typedef std::pair<std::vector<size_t>, std::vector<float>> SerializedNeuralNet;
 	void SerializeToVector(SerializedNeuralNet& serializedNet) const;
 	static void GeneticBlend(SerializedNeuralNet& const parent1, SerializedNeuralNet& const parent2, SerializedNeuralNet& child);
 	static void Mutate(SerializedNeuralNet& net, float mutationRate = DEFAULT_MUTATION_RATE, float mutationAmount = DEFAULT_MUTATION_AMOUNT);
