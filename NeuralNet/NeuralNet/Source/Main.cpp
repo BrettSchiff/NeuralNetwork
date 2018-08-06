@@ -95,6 +95,12 @@ void TestAverage()
 	}
 }
 
+void TestGameCreateTopology(std::vector<size_t>& gameTopology)
+{
+	gameTopology.push_back(NUM_ROWS_SEEN * GAME_HEIGHT);
+	gameTopology.push_back(3);
+}
+
 void RunTestGame_Train(NeuralNet& gameNet)
 {
 	for (size_t i = 0; i < NUM_GAME_TRAINING_FRAMES; i++)
@@ -220,10 +226,7 @@ void RunTestGame(NeuralNet& gameNet)
 void RunTestGame()
 {
 	std::vector<size_t> gameTopology;
-	gameTopology.push_back(NUM_ROWS_SEEN * GAME_HEIGHT);
-	gameTopology.push_back(GAME_HEIGHT);
-	gameTopology.push_back(3);
-
+	TestGameCreateTopology(gameTopology);
 	NeuralNet gameNet(gameTopology);
 
 	RunTestGame(gameNet);
@@ -283,9 +286,7 @@ void TestSerializeWithGame()
 {
 	// create the initial neural network
 	std::vector<size_t> gameTopology;
-	gameTopology.push_back(NUM_ROWS_SEEN * GAME_HEIGHT);
-	gameTopology.push_back(GAME_HEIGHT);
-	gameTopology.push_back(3);
+	TestGameCreateTopology(gameTopology);
 	NeuralNet gameNet(gameTopology);
 
 	// train the network
@@ -364,10 +365,7 @@ void TestGeneticsWithGame()
 	for (size_t i = 0; i < GEN_NETS_PER_GEN; i++)
 	{
 		std::vector<size_t> gameTopology;
-		gameTopology.push_back(NUM_ROWS_SEEN * GAME_HEIGHT);
-		gameTopology.push_back(GAME_HEIGHT);
-		gameTopology.push_back(3);
-
+		TestGameCreateTopology(gameTopology);
 		Nets.push_back(std::make_pair(0, NeuralNet(gameTopology)));
 	}
 
