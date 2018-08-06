@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////
 #pragma once
 #include <vector>
+#include <string>
 #include "Neuron.h"
 
 #define DEFAULT_MUTATION_RATE   .1f
@@ -24,6 +25,7 @@ public:
 	// constructors
 	NeuralNet(const std::vector<size_t>& topology);
 	NeuralNet(const std::vector<size_t>& topology, const std::vector<float>& weights);
+	NeuralNet(std::string filename);
 
 	// methods
 	void FeedForward(const std::vector<float>& inputs);
@@ -34,8 +36,12 @@ public:
 	void SerializeToVector(SerializedNeuralNet& serializedNet) const;
 	static void GeneticBlend(SerializedNeuralNet& const parent1, SerializedNeuralNet& const parent2, SerializedNeuralNet& child);
 	static void Mutate(SerializedNeuralNet& net, float mutationRate = DEFAULT_MUTATION_RATE, float mutationAmount = DEFAULT_MUTATION_AMOUNT);
+	void SaveToFile(std::string filename) const;
 
 private:
+	// setup from vectors
+	void SetupFromVectors(const std::vector<size_t>& topology, const std::vector<float>& weights);
+
 	// private methods
 	size_t NumberOfLayers() const;
 	size_t NumberOfNeuronsInLayer(size_t layerNumber) const;

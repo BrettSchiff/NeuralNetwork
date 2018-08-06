@@ -11,6 +11,7 @@
 #include "Neuron.h"
 #include <iostream>
 #include <cassert>
+#include <fstream>
 
 // constructors
 NeuralNet::NeuralNet(const std::vector<size_t> &topology)
@@ -40,30 +41,35 @@ NeuralNet::NeuralNet(const std::vector<size_t> &topology)
 
 NeuralNet::NeuralNet(const std::vector<size_t>& topology, const std::vector<float>& weights)
 {
-	// the number of layers
-	size_t numLayers = topology.size();
-	// index of weights for neurons to read
-	size_t index = 0;
+	SetupFromVectors(topology, weights);
+}
 
-	// add each layer to the neural net
-	for (size_t i = 0; i < numLayers; ++i)
+NeuralNet::NeuralNet(std::string filename)
+{
+	std::ifstream infile(filename);
+	assert(infile.is_open());
+
+	SerializedNeuralNet loadedVector;
+
+	size_t topographySize;
+	infile >> topographySize;
+	for (size_t i = 0; i < topographySize; i++)
 	{
-		// get the number of neurons in the next layer, if there is a next layer, otherwise 0
-		size_t numOutputs = (i == (numLayers - 1)) ? 0 : topology[i + 1] - 1;
-
-		// add a new layer
-		m_layers.push_back(Layer());
-
-		// add the neurons to that layer
-		for (size_t j = 0; j < topology[i]; j++)
-		{
-			m_layers.back().push_back(Neuron(numOutputs, j));
-			m_layers.back().back().ReadInWeights(weights, index);
-		}
-
-		// set the bias neuron's output to 1
-		m_layers.back().back().SetOutputValue(1.0);
+		size_t nextSize;
+		infile >> nextSize;
+		loadedVector.first.push_back(nextSize);
 	}
+
+	size_t weightSize;
+	infile >> weightSize;
+	for (size_t i = 0; i < weightSize; i++)
+	{
+		float nextWeight;
+		infile >> nextWeight;
+		loadedVector.second.push_back(nextWeight);
+	}
+
+	SetupFromVectors(loadedVector.first, loadedVector.second);
 }
 
 // methods
@@ -225,6 +231,58 @@ void NeuralNet::Mutate(SerializedNeuralNet& net, float mutationRate, float mutat
 			// assign new mutated weight
 			net.second[i] = mutatedWeight;
 		}
+	}
+}
+
+void NeuralNet::SaveToFile(std::string filename) const
+{
+	std::ofstream savefile(filename);
+	assert(savefile.is_open());
+
+	SerializedNeuralNet vec;
+	SerializeToVector(vec);
+
+	savefile << vec.first.size() << std::endl;
+	for (size_t i = 0; i < vec.first.size(); ++i)
+	{
+		savefile << vec.first[i] << " ";
+	}
+	savefile << std::endl;
+	savefile << vec.second.size() << std::endl;
+	for (size_t i = 0; i < vec.second.size(); ++i)
+	{
+		savefile << vec.second[i] << " ";
+	}
+	savefile << std::endl;
+}
+
+
+
+void NeuralNet::SetupFromVectors(const std::vector<size_t>& topology, const std::vector<float>& weights)
+{
+	// the number of layers
+	size_t numLayers = topology.size();
+	// index of weights for neurons to read
+	size_t index = 0;
+
+	// add each layer to the neural net
+	for (size_t i = 0; i < numLayers; ++i)
+	{
+		// get the number of neurons in the next layer, if there is a next layer, otherwise 0
+		size_t numOutputs = (i == (numLayers - 1)) ? 0 : topology[i + 1] - 1;
+
+		// add a new layer
+		m_layers.push_back(Layer());
+
+		// add the neurons to that layer
+		for (size_t j = 0; j < topology[i]; j++)
+		{
+			m_layers.back().push_back(Neuron(numOutputs, j));
+			m_layers.back().back().ReadInWeights(weights, index);
+		}
+
+		// set the bias neuron's output to 1
+		m_layers.back().back().SetOutputValue(1.0);
 	}
 }
 

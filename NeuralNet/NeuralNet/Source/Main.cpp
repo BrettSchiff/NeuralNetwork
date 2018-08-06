@@ -38,6 +38,7 @@ void PlayGame();
 void RunTestGame();
 void TestSerializeWithGame();
 void TestGeneticsWithGame();
+void TestLoadWithGame(std::string filename);
 
 int main()
 {
@@ -54,7 +55,10 @@ int main()
 	//TestSerializeWithGame();
 
 	// Test Genetic Selection
-	TestGeneticsWithGame();
+	//TestGeneticsWithGame();
+
+	// Test loading net from file
+	TestLoadWithGame("SavedNeuralNet");
 
 	return 0;
 }
@@ -195,8 +199,7 @@ void RunTestGame_Play(NeuralNet& gameNet)
 
 		for (int i = 0; i < netResult.size(); ++i)
 		{
-			std::cout << netResult[i] << std::endl;
-			printf("%.3f", netResult[i]);
+			printf("%.3f\n", netResult[i]);
 		}
 
 		Sleep(static_cast<int>(GAME_TIME_BETWEEN_MOVES * 1000));
@@ -338,6 +341,13 @@ public:
 	}
 };
 
+void TestLoadWithGame(std::string filename)
+{
+	NeuralNet loaded(filename);
+
+	RunTestGame_Play(loaded);
+}
+
 //#pragma optimize("", off)
 // func prototypes
 void PrepareNextGen(Generation& oldGen);
@@ -369,6 +379,8 @@ void TestGeneticsWithGame()
 	}
 
 	// at this point, our best neural net should be in the top slot of Nets
+	Nets[0].second.SaveToFile("SavedNeuralNet");
+
 	std::cout << "\n\n\t\tThe nets have been trained. Here is the best. Press Enter to Continue\n";
 	getchar();
 	RunTestGame_Play(Nets[0].second);
